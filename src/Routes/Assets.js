@@ -29,7 +29,7 @@ import abi_burni from "../assets/burni_abi.json";
 import abi_burnin from "../assets/burnin_abi.json";
 import Web3 from "web3";
 import moment from "moment";
-import { FaEthereum } from "react-icons/fa";
+import { FaEthereum, FaRegClock } from "react-icons/fa";
 import { MdMoreVert } from "react-icons/md";
 import { weiIntValue } from "../utils";
 
@@ -50,12 +50,26 @@ const useStyles = makeStyles(theme => ({
   bold: {
     fontWeight: "bold"
   },
+  sans: {
+    fontFamily: "Roboto",
+    fontSize: "0.8rem"
+  },
+  uppercase: {
+    textTransform: "uppercase"
+  },
   mono: {
     fontFamily: "monospace, courier",
     fontSize: "16px",
     fontWeight: "bold",
     textOverflow: "ellipsis",
     overflow: "hidden"
+  },
+  monoSmall: {
+    fontFamily: "monospace, courier",
+    fontSize: "0.75rem !important",
+    textOverflow: "ellipsis",
+    overflow: "hidden",
+    textTransform: "uppercase"
   },
   moreMenu: {
     fontFamily: "Roboto"
@@ -121,8 +135,8 @@ export const Connected = ({
       </Typography>
       <ListItem divider />
       <List className={classes.root}>
-        {nfts.map(({ id, age, multihash, valuation }) => (
-          <ListItem key={id}>
+        {nfts.map(({ id, age, genhash, multihash, valuation }) => (
+          <ListItem key={id} alignItems="flex-start">
             <ListItemAvatar>
               <Avatar classes={{ root: classes.avatar }}>
                 <FaEthereum />
@@ -132,6 +146,7 @@ export const Connected = ({
               disableTypography
               primary={
                 <Box className={classes.mono}>
+                  {id}:&nbsp;
                   {multihash ? (
                     <a
                       target="_blank"
@@ -148,10 +163,26 @@ export const Connected = ({
                 </Box>
               }
               secondary={
-                <Box display="flex" alignItems="flex-end" marginRight={2}>
-                  <Box>{`ID: ${id} | Created: ${age}`}</Box>
-                  <Box style={{ flexGrow: 1 }}></Box>
-                  <Box>{`${valuation} BURN`}</Box>
+                <Box>
+                  <Box display="flex" alignItems="flex-end" marginRight={2}>
+                    <Typography variant="caption" className={classes.uppercase}>
+                      Genesis:&nbsp;
+                    </Typography>
+                    <Typography className={classes.monoSmall}>
+                      {genhash}
+                    </Typography>
+                  </Box>
+                  <Box
+                    display="flex"
+                    alignItems="flex-end"
+                    marginRight={2}
+                    className={classes.sans}
+                  >
+                    <Box display="flex" alignItems="center">
+                      <FaRegClock size={12} style={{ marginRight: "4px" }} />
+                      {`${age} | ${valuation} BURN`}
+                    </Box>
+                  </Box>
                 </Box>
               }
             />
@@ -308,8 +339,11 @@ export default () => {
         await burninContract.methods.balanceOf(k0).call({ from: k0 })
       );
 
-      // Map asset indices to { id, multihash, valuation }
+      // Map asset indices to { id, blockNumber, age, genhash, multihash, valuation }
       const tokenIdxList = [...Array(numNFTs).keys()];
+
+      // Get latest block
+      const latestBlockNumber = await window.web3.eth.getBlockNumber();
 
       const _nfts = await Promise.all(
         tokenIdxList.map(async idx => {
@@ -333,6 +367,26 @@ export default () => {
           const createdAt = moment.unix(block.timestamp);
           const age = moment(createdAt).fromNow();
 
+          // Attempt to create NFT genesis hash
+          // The prfefx, token id and 5 blockhashes (in utf-8) following minting
+          // are concatenated and hashed (sha3) to create a semi-random value.
+          // Eg. sha3("burnin10x0010x0020x0030x0040x005")
+          let genhash = "-";
+
+          if (latestBlockNumber - blockNumber > 5) {
+            const futureBlocks = [...Array(5).keys()].map(v => v + blockNumber);
+            const blockHashes = (
+              await Promise.all(
+                futureBlocks.map(blockNumber =>
+                  window.web3.eth.getBlock(blockNumber)
+                )
+              )
+            )
+              .map(block => block.hash)
+              .join("");
+            genhash = window.web3.utils.sha3("burnin" + id + blockHashes);
+          }
+
           const multihash = await burninContract.methods
             .getMultihash(id)
             .call({ from: k0 });
@@ -343,7 +397,7 @@ export default () => {
 
           // Convert valuation from wei -> eth
           const valuation = window.web3.utils.fromWei(valuationWei, "ether");
-          return { id, blockNumber, age, multihash, valuation };
+          return { id, blockNumber, age, genhash, multihash, valuation };
         })
       );
 

@@ -52,7 +52,9 @@ const useStyles = makeStyles(theme => ({
   mono: {
     fontFamily: "monospace, courier",
     fontSize: "16px",
-    fontWeight: "bold"
+    fontWeight: "bold",
+    textOverflow: "ellipsis",
+    overflow: "hidden"
   },
   moreMenu: {
     fontFamily: "Roboto"

@@ -75,11 +75,11 @@ export default () => {
             <img src="./logo_white.svg" height="92" alt="Burni Logo" />
           </div>
           <Button
-            href="#get-started"
+            href="https://opensea.io/storefront/burnin"
             color="inherit"
             classes={{ root: classes.navButton }}
           >
-            Get Started
+            Marketplace
           </Button>
         </Toolbar>
         <Box

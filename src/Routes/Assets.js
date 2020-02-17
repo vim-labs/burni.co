@@ -149,7 +149,7 @@ export const Connected = ({
               disableTypography
               primary={
                 <Box className={classes.mono}>
-                  {id}:&nbsp;
+                  #{id}:&nbsp;
                   {multihash ? (
                     <a
                       target="_blank"

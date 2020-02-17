@@ -86,7 +86,10 @@ export default () => {
               </span>{" "}
               can be set a <span className={classes.bold}>single time</span> for
               a token, wrapping the underlying asset, collectable, or artwork
-              inside the token.
+              inside the token. Post-minting, the following 5 block hashes are
+              concatenated with a prefix and token ID to create a pseudorandom{" "}
+              <span className={classes.bold}>genesis hash</span> for use in
+              collectible attribute definitions.
             </Typography>
           </Box>
         </Box>

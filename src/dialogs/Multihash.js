@@ -78,16 +78,18 @@ export default ({ accountHolder, selected, open, onClose }) => {
         {isSettingMultihash && <CircularProgress size={16} />}
         <Box flexGrow={1}></Box>
         <Button onClick={handleClose}>Cancel</Button>
-        <Button
-          disabled={multihash.length === 0 || isSettingMultihash}
-          onClick={() => {
-            handleSetMultihash(multihash, selected.id);
-          }}
-          variant="contained"
-          color="secondary"
-        >
-          Send
-        </Button>
+        <Box marginLeft={1}>
+          <Button
+            disabled={multihash.length === 0 || isSettingMultihash}
+            onClick={() => {
+              handleSetMultihash(multihash, selected.id);
+            }}
+            variant="contained"
+            color="secondary"
+          >
+            Send
+          </Button>
+        </Box>
       </Box>
     </Dialog>
   );

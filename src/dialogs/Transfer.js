@@ -78,16 +78,18 @@ export default ({ accountHolder, selected, open, onClose }) => {
         {isTransferring && <CircularProgress size={16} />}
         <Box flexGrow={1}></Box>
         <Button onClick={handleClose}>Cancel</Button>
-        <Button
-          disabled={recipient.length !== 42 || isTransferring}
-          onClick={() => {
-            handleTransfer(recipient, selected.id);
-          }}
-          variant="contained"
-          color="secondary"
-        >
-          Send
-        </Button>
+        <Box marginLeft={1}>
+          <Button
+            disabled={recipient.length !== 42 || isTransferring}
+            onClick={() => {
+              handleTransfer(recipient, selected.id);
+            }}
+            variant="contained"
+            color="secondary"
+          >
+            Send
+          </Button>
+        </Box>
       </Box>
     </Dialog>
   );

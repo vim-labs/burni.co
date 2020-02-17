@@ -36,7 +36,10 @@ import { weiIntValue } from "../utils";
 const useStyles = makeStyles(theme => ({
   avatar: {
     backgroundColor: "#000",
-    color: "#ffe600"
+    color: "#ffe600",
+    width: 64,
+    height: 64,
+    marginRight: theme.spacing(2)
   },
   button: {
     padding: theme.spacing(1),

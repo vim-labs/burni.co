@@ -8,9 +8,10 @@ exports.handler = (e, ctx, cb) => {
 
   // Add IPFS Gateway if token is passed
   const pathPrefix = "/nft/";
+  const multihash = e.path.slice(pathPrefix.length);
   if (e.path.length > pathPrefix.length) {
-    tokenMetadata["external_url"] =
-      "https://ipfs.io/ipfs/" + e.path.slice(pathPrefix.length);
+    tokenMetadata["name"] = `Burnin: ${multihash}`;
+    tokenMetadata["external_url"] = `https://ipfs.io/ipfs/${multihash}`;
   }
 
   cb(null, {

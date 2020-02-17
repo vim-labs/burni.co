@@ -1,0 +1,2 @@
+/nft /.netlify/functions/nft 200
+/nft/* /.netlify/functions/nft 200

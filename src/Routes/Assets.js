@@ -371,13 +371,15 @@ export default () => {
           const age = moment(createdAt).fromNow();
 
           // Attempt to create NFT genesis hash
-          // The prfefx, token id and 5 blockhashes (in utf-8) following minting
+          // The contract address, token id and 5 blockhashes (in utf-8) following minting
           // are concatenated and hashed (sha3) to create a semi-random value.
-          // Eg. sha3("burnin10x0010x0020x0030x0040x005")
+          // Eg. sha3("burnin0x0010x0010x0020x0030x0040x005")
           let genhash = "-";
 
           if (latestBlockNumber - blockNumber > 5) {
-            const futureBlocks = [...Array(5).keys()].map(v => v + blockNumber);
+            const futureBlocks = [...Array(5).keys()].map(
+              v => v + blockNumber + 1
+            );
             const blockHashes = (
               await Promise.all(
                 futureBlocks.map(blockNumber =>
@@ -387,7 +389,7 @@ export default () => {
             )
               .map(block => block.hash)
               .join("");
-            genhash = window.web3.utils.sha3("burnin" + id + blockHashes);
+            genhash = window.web3.utils.sha3(burninAddress + id + blockHashes);
           }
 
           const multihash = await burninContract.methods

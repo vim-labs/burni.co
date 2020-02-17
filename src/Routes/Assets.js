@@ -28,6 +28,7 @@ import Dialogs from "../Dialogs";
 import abi_burni from "../assets/burni_abi.json";
 import abi_burnin from "../assets/burnin_abi.json";
 import Web3 from "web3";
+import moment from "moment";
 import { FaEthereum } from "react-icons/fa";
 import { MdMoreVert } from "react-icons/md";
 import { weiIntValue } from "../utils";
@@ -120,7 +121,7 @@ export const Connected = ({
       </Typography>
       <ListItem divider />
       <List className={classes.root}>
-        {nfts.map(({ id, multihash, valuation }) => (
+        {nfts.map(({ id, age, multihash, valuation }) => (
           <ListItem key={id}>
             <ListItemAvatar>
               <Avatar classes={{ root: classes.avatar }}>
@@ -148,7 +149,7 @@ export const Connected = ({
               }
               secondary={
                 <Box display="flex" alignItems="flex-end" marginRight={2}>
-                  <Box>{`ID: ${id}`}</Box>
+                  <Box>{`ID: ${id} | Created: ${age}`}</Box>
                   <Box style={{ flexGrow: 1 }}></Box>
                   <Box>{`${valuation} BURN`}</Box>
                 </Box>
@@ -309,11 +310,28 @@ export default () => {
 
       // Map asset indices to { id, multihash, valuation }
       const tokenIdxList = [...Array(numNFTs).keys()];
+
       const _nfts = await Promise.all(
         tokenIdxList.map(async idx => {
           const id = await burninContract.methods
             .tokenOfOwnerByIndex(k0, idx)
             .call({ from: k0 });
+
+          const blockNumber = (
+            await burninContract.getPastEvents("Transfer", {
+              filter: {
+                from: "0x0000000000000000000000000000000000000000",
+                tokenId: id
+              },
+              fromBlock: 9497370,
+              toBlock: "latest"
+            })
+          ).map(event => {
+            return event["blockNumber"];
+          })[0];
+          const block = await window.web3.eth.getBlock(blockNumber);
+          const createdAt = moment.unix(block.timestamp);
+          const age = moment(createdAt).fromNow();
 
           const multihash = await burninContract.methods
             .getMultihash(id)
@@ -325,7 +343,7 @@ export default () => {
 
           // Convert valuation from wei -> eth
           const valuation = window.web3.utils.fromWei(valuationWei, "ether");
-          return { id, multihash, valuation };
+          return { id, blockNumber, age, multihash, valuation };
         })
       );
 

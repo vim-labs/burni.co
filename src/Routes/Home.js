@@ -29,7 +29,7 @@ export default () => {
     <>
       <AppBar
         headline="Poof. Gone."
-        subheading="A new class of exchangable cryptocurrency assets"
+        subheading="A new class of exchangeable cryptocurrency assets"
       >
         <Button href="https://uniswap.io/" classes={{ root: classes.button }}>
           Available on Uniswap

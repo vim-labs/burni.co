@@ -371,9 +371,9 @@ export default () => {
           const age = moment(createdAt).fromNow();
 
           // Attempt to create NFT genesis hash
-          // The contract address, token id and 5 blockhashes (in utf-8) following minting
-          // are concatenated and hashed (sha3) to create a semi-random value.
-          // Eg. sha3("burnin0x0010x0010x0020x0030x0040x005")
+          // sha3(join([CONTRACT_ADDRESS, TOKEN_ID, MINT_BLOCK_HASH+1,
+          //            MINT_BLOCK_HASH+2, MINT_BLOCK_HASH+3, MINT_BLOCK_HASH+4,
+          //            MINT_BLOCK_HASH+5]))
           let genhash = "-";
 
           if (latestBlockNumber - blockNumber > 5) {
